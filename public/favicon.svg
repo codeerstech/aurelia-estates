@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Aurelia Estates favicon">
+  <rect width="64" height="64" rx="14" fill="#17120e"/>
+  <rect x="7" y="7" width="50" height="50" rx="11" fill="none" stroke="#d2a65f" stroke-opacity="0.35" stroke-width="2"/>
+  <path fill="#d2a65f" fill-rule="evenodd" d="M32 10 11 52h8.9l3.7-8h16.8l3.7 8H53L32 10Zm-4.9 26.3L32 25.6l4.9 10.7h-9.8Z"/>
+  <path d="M17 37 32 16l15 21" fill="none" stroke="#f7f3ec" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5"/>
+  <path d="M32 41c-3.3 0-6 2.7-6 6v5h12v-5c0-3.3-2.7-6-6-6Z" fill="#17120e"/>
+  <path d="M21 52h22" stroke="#f7f3ec" stroke-linecap="round" stroke-width="2.5"/>
+</svg>
