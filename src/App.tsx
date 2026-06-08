@@ -37,6 +37,68 @@ import { LEAD_ERROR_MESSAGE, LEAD_SUCCESS_MESSAGE, submitLead } from './lib/lead
 
 type LeadValues = Record<LeadFormField['name'], string>
 type LeadErrors = Partial<Record<LeadFormField['name'], string>>
+type RoutePath = '/' | '/about-us' | '/privacy-policy'
+
+type StaticPageContent = {
+  metaTitle: string
+  metaDescription: string
+  eyebrow: string
+  title: string
+  description: string
+  sections: Array<{
+    title: string
+    body: string
+  }>
+}
+
+const routePaths = new Set<RoutePath>(['/', '/about-us', '/privacy-policy'])
+
+const staticPages: Record<Exclude<RoutePath, '/'>, StaticPageContent> = {
+  '/about-us': {
+    metaTitle: `About Us | ${site.brand.name}`,
+    metaDescription: `${site.brand.name} private residential advisory story, buyer standards, and viewing support.`,
+    eyebrow: 'About us',
+    title: `Meet ${site.brand.name}`,
+    description:
+      'Aurelia Estates helps serious buyers compare refined residences, understand trade-offs, and move from first brief to private viewing with confidence.',
+    sections: [
+      {
+        title: 'What we do',
+        body: 'We support US, UK, relocation, investment, and second-home buyers with curated shortlists, viewing planning, and next-step advisory.',
+      },
+      {
+        title: 'How we support buyers',
+        body: 'Our process is built around clear briefs, discreet seller contact, practical due-diligence prompts, and calm communication through each stage.',
+      },
+      {
+        title: 'Our standard',
+        body: 'Every enquiry is handled with context: budget, timing, lifestyle needs, legal introductions, survey considerations, and relocation requirements.',
+      },
+    ],
+  },
+  '/privacy-policy': {
+    metaTitle: `Privacy Policy | ${site.brand.name}`,
+    metaDescription: `${site.brand.name} privacy policy for property enquiries, viewing requests, and residential advisory communications.`,
+    eyebrow: 'Privacy policy',
+    title: 'Privacy Policy',
+    description:
+      'This page explains how enquiry details and website information are handled for property consultations and viewing requests.',
+    sections: [
+      {
+        title: 'Information we collect',
+        body: 'We collect details visitors choose to submit through enquiry forms, such as name, email, phone, buying interest, preferred market, and message context.',
+      },
+      {
+        title: 'How we use information',
+        body: 'Submitted information is used to respond to property requests, prepare relevant follow-up, and coordinate private viewing conversations.',
+      },
+      {
+        title: 'Customer choices',
+        body: 'Visitors can choose not to submit optional forms and can request support with submitted enquiry details or communication preferences.',
+      },
+    ],
+  },
+}
 
 const iconMap = {
   award: Award,
@@ -72,6 +134,15 @@ function initialValues(config: LeadFormConfig): LeadValues {
 
 function projectKey() {
   return site.brand.shortName.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+}
+
+function getRoutePath(): RoutePath {
+  const path = window.location.pathname as RoutePath
+  return routePaths.has(path) ? path : '/'
+}
+
+function localHref(href: string) {
+  return href.startsWith('#') ? `/${href}` : href
 }
 
 function ImageFrame({
@@ -146,7 +217,7 @@ function Header({ onOpenModal }: { onOpenModal: () => void }) {
         {site.announcement}
       </div>
       <div className="mx-auto flex h-20 w-[min(var(--container),calc(100%-32px))] items-center justify-between gap-5">
-        <a className="flex min-w-max items-center gap-3" href="#top" aria-label={`${site.brand.name} home`}>
+        <a className="flex min-w-max items-center gap-3" href="/" aria-label={`${site.brand.name} home`}>
           <span className="grid h-11 w-11 place-items-center rounded-[var(--radius-card)] bg-[var(--color-dark)] text-[var(--color-gold)]">
             <Building2 size={24} aria-hidden="true" />
           </span>
@@ -164,7 +235,7 @@ function Header({ onOpenModal }: { onOpenModal: () => void }) {
               </button>
               <div className="pointer-events-none absolute left-1/2 top-full w-64 -translate-x-1/2 translate-y-2 rounded-[var(--radius-card)] border border-[var(--color-line)] bg-[var(--color-surface)] p-3 opacity-0 shadow-[var(--shadow-card)] transition group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100">
                 {group.items.map((item) => (
-                  <a className="block rounded-[var(--radius-control)] px-3 py-2 text-sm font-bold text-[var(--color-muted)] hover:bg-[var(--color-surface-soft)] hover:text-[var(--color-accent-dark)]" href={item.href} key={item.href}>
+                  <a className="block rounded-[var(--radius-control)] px-3 py-2 text-sm font-bold text-[var(--color-muted)] hover:bg-[var(--color-surface-soft)] hover:text-[var(--color-accent-dark)]" href={localHref(item.href)} key={item.href}>
                     {item.label}
                   </a>
                 ))}
@@ -188,7 +259,7 @@ function Header({ onOpenModal }: { onOpenModal: () => void }) {
       {mobileOpen ? (
         <div className="border-t border-[var(--color-line)] bg-[var(--color-surface)] p-4 lg:hidden">
           {navGroups.flatMap((group) => group.items).map((item) => (
-            <a className="block rounded-[var(--radius-control)] px-3 py-3 font-bold text-[var(--color-heading)]" href={item.href} key={item.href} onClick={() => setMobileOpen(false)}>
+            <a className="block rounded-[var(--radius-control)] px-3 py-3 font-bold text-[var(--color-heading)]" href={localHref(item.href)} key={item.href} onClick={() => setMobileOpen(false)}>
               {item.label}
             </a>
           ))}
@@ -622,19 +693,55 @@ function Modal({ open, onClose }: { open: boolean; onClose: () => void }) {
   )
 }
 
+function StaticPage({ content }: { content: StaticPageContent }) {
+  return (
+    <section className="bg-[var(--color-background)]">
+      <div className="mx-auto grid w-[min(var(--container),calc(100%-32px))] gap-10 py-16 lg:grid-cols-[0.78fr_1.22fr]">
+        <motion.div className="lg:sticky lg:top-32 lg:h-fit" {...reveal(0)}>
+          <p className="mb-3 text-xs font-black uppercase tracking-[0.22em] text-[var(--color-accent-dark)]">{content.eyebrow}</p>
+          <h1 className="text-5xl font-black uppercase leading-tight text-[var(--color-heading)] md:text-7xl">{content.title}</h1>
+          <p className="mt-5 text-lg leading-8 text-[var(--color-muted)]">{content.description}</p>
+          <a className="mt-8 inline-flex rounded-[var(--radius-pill)] bg-[var(--color-accent)] px-6 py-4 text-sm font-black uppercase text-white" href="/#callback">
+            Enquire Now
+          </a>
+        </motion.div>
+        <div className="grid gap-5">
+          {content.sections.map((section, index) => (
+            <motion.article className="rounded-[var(--radius-card)] border border-[var(--color-line)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-card)]" key={section.title} {...reveal(index * 0.05)}>
+              <h2 className="text-2xl font-black text-[var(--color-heading)]">{section.title}</h2>
+              <p className="mt-3 leading-7 text-[var(--color-muted)]">{section.body}</p>
+            </motion.article>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
 export default function App() {
+  const [route, setRoute] = useState<RoutePath>(() => getRoutePath())
   const [modalOpen, setModalOpen] = useState(false)
   const cssVars = useMemo(() => themeStyle(), [])
 
   useEffect(() => {
-    document.title = page.meta.title
+    const staticContent = route !== '/' ? staticPages[route] : null
+    document.title = staticContent?.metaTitle ?? page.meta.title
     let description = document.querySelector<HTMLMetaElement>('meta[name="description"]')
     if (!description) {
       description = document.createElement('meta')
       description.name = 'description'
       document.head.appendChild(description)
     }
-    description.content = page.meta.description
+    description.content = staticContent?.metaDescription ?? page.meta.description
+    if (!window.location.hash) {
+      window.scrollTo({ top: 0, behavior: 'auto' })
+    }
+  }, [route])
+
+  useEffect(() => {
+    const handlePopState = () => setRoute(getRoutePath())
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
   }, [])
 
   return (
@@ -642,6 +749,10 @@ export default function App() {
       <Header onOpenModal={() => setModalOpen(true)} />
 
       <main>
+        {route !== '/' ? (
+          <StaticPage content={staticPages[route]} />
+        ) : (
+          <>
         <section className="relative bg-[var(--color-dark)] text-white">
           <div className="absolute inset-0 opacity-55">
             {page.hero.imageUrl ? (
@@ -657,11 +768,11 @@ export default function App() {
               <h1 className="text-5xl font-black leading-[0.95] md:text-7xl">{page.hero.title}</h1>
               <p className="mt-6 max-w-2xl text-lg text-white/78 md:text-xl">{page.hero.subtitle}</p>
               <div className="mt-8 flex flex-wrap gap-3">
-                <a className="inline-flex items-center gap-2 rounded-[var(--radius-pill)] bg-[var(--color-accent)] px-6 py-4 text-sm font-black uppercase tracking-[0.12em] text-white transition hover:-translate-y-0.5 hover:bg-[var(--color-accent-dark)]" href={page.hero.primaryCta.href}>
+                <a className="inline-flex items-center gap-2 rounded-[var(--radius-pill)] bg-[var(--color-accent)] px-6 py-4 text-sm font-black uppercase tracking-[0.12em] text-white transition hover:-translate-y-0.5 hover:bg-[var(--color-accent-dark)]" href={localHref(page.hero.primaryCta.href)}>
                   {page.hero.primaryCta.label}
                   <ArrowRight size={17} aria-hidden="true" />
                 </a>
-                <a className="inline-flex items-center gap-2 rounded-[var(--radius-pill)] border border-white/35 px-6 py-4 text-sm font-black uppercase tracking-[0.12em] text-white transition hover:-translate-y-0.5 hover:bg-white/10" href={page.hero.secondaryCta.href}>
+                <a className="inline-flex items-center gap-2 rounded-[var(--radius-pill)] border border-white/35 px-6 py-4 text-sm font-black uppercase tracking-[0.12em] text-white transition hover:-translate-y-0.5 hover:bg-white/10" href={localHref(page.hero.secondaryCta.href)}>
                   {page.hero.secondaryCta.label}
                 </a>
               </div>
@@ -789,12 +900,18 @@ export default function App() {
             <LeadForm config={page.leadForm} formId="callback" />
           </motion.div>
         </section>
+          </>
+        )}
       </main>
 
       <footer className="border-t border-[var(--color-line)] bg-[var(--color-surface)]">
         <div className="mx-auto flex w-[min(var(--container),calc(100%-32px))] flex-col gap-4 py-8 text-sm text-[var(--color-muted)] md:flex-row md:items-center md:justify-between">
           <span>{site.footer}</span>
-          <span>{site.brand.name}</span>
+          <div className="flex flex-wrap gap-4">
+            <a className="font-bold text-[var(--color-heading)]" href="/about-us">About Us</a>
+            <a className="font-bold text-[var(--color-heading)]" href="/privacy-policy">Privacy Policy</a>
+            <span>{site.brand.name}</span>
+          </div>
         </div>
       </footer>
 

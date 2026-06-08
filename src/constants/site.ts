@@ -30,7 +30,8 @@ export const navGroups: NavGroup[] = [
   {
     label: 'Company',
     items: [
-      { label: 'About Us', href: '#about' },
+      { label: 'About Us', href: '/about-us' },
+      { label: 'Privacy Policy', href: '/privacy-policy' },
       { label: 'Results', href: '#stats' },
       { label: 'Enquire Now', href: '#callback' },
     ],

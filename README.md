@@ -1,12 +1,17 @@
 # Aurelia Estates
 
-Working luxury real-estate advisory website with featured property briefs, About Us, buyer journey, virtual tour, enquiry forms, live lead capture, and a dismissible cookie notice.
+Working luxury real-estate advisory website with featured property briefs, About Us and Privacy Policy pages, buyer journey, virtual tour, enquiry forms, live lead capture, and a dismissible cookie notice.
 
 Live tour imagery is stored in `public/images/tour-live/` and uses free-stock references from Pexels and Unsplash for the editable real-estate tour template.
 
 Enquiry forms post to `https://dev.indemnisezmoi.fr/api/lead` and show:
 
 `Details saved. We will reach you shortly.`
+
+## Required Routes
+
+- `/about-us`
+- `/privacy-policy`
 
 Keep Aurelia production-facing. Do not show:
 
